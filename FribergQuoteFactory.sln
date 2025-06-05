@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FribergQuoteFactory.Api", "FribergQuoteFactory.Api\FribergQuoteFactory.Api.csproj", "{BA30AE58-FBD0-4EBF-AAFB-D63119D89C67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FribergQuoteFactory.Tests", "FribergQuoteFactory.Tests\FribergQuoteFactory.Tests.csproj", "{723F86EB-6C0F-43BC-9362-5F5A2C1985BF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA30AE58-FBD0-4EBF-AAFB-D63119D89C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA30AE58-FBD0-4EBF-AAFB-D63119D89C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA30AE58-FBD0-4EBF-AAFB-D63119D89C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA30AE58-FBD0-4EBF-AAFB-D63119D89C67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{723F86EB-6C0F-43BC-9362-5F5A2C1985BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{723F86EB-6C0F-43BC-9362-5F5A2C1985BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{723F86EB-6C0F-43BC-9362-5F5A2C1985BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{723F86EB-6C0F-43BC-9362-5F5A2C1985BF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0EA74660-1353-4059-9A52-4DE66DDC8806}
+	EndGlobalSection
+EndGlobal
