@@ -2,11 +2,11 @@
 
 ## API Functionality
 
-1. **As a user, I want to retrieve a random quote, so that I can get inspiration.**
+1. **As a user, I want to submit a new quote with a quote text and category, so that I can contribute to the platform.**
 
-2. **As a user, I want to retrieve a random quote from a specific category (entrepreneurship, self-development, motivation, leadership, success), so that I can get tailored inspiration.**
+2. **As a user, I want to retrieve a random quote, so that I can get inspiration.**
 
-3. **As a user, I want to submit a new quote with a quote text and category, so that I can contribute to the platform.**
+3. **As a user, I want to retrieve a random quote from a specific category (entrepreneurship, self-development, motivation, leadership, success), so that I can get tailored inspiration.**
 
 4. **As an administrator, I want to list all quotes that have not yet been approved, so that I can review new submissions.**
 
