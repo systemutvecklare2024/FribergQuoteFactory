@@ -98,5 +98,21 @@ namespace FribergQuoteFactory.Tests.Fixtures
                 Category = "success"
             }
         };
+
+        public static List<Quote> GetQuotesForApproveTest() => new()
+        {
+            new Quote
+            {
+                QuoteText = "Fortune favors the bold.",
+                Category = "entrepreneurship",
+                Approved = true
+            },
+            new Quote
+            {
+                QuoteText = "Start where you are. Use what you have. Do what you can.",
+                Category = "entrepreneurship",
+                Approved = false
+            },
+        };
     }
 }
