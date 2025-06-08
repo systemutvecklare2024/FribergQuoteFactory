@@ -1,4 +1,5 @@
-﻿using FribergQuoteFactory.Api.Data;
+﻿using FribergQuoteFactory.Api.Contracts;
+using FribergQuoteFactory.Api.Data;
 using FribergQuoteFactory.Api.Models;
 using FribergQuoteFactory.Api.Repositories;
 using FribergQuoteFactory.Tests.Fixtures;
@@ -55,20 +56,6 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task GetTaskAsync_WithQuotes_ReturnsOnlyApprovedQuotes()
-        {
-            // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
-            await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
-
-            // Act
-            var quotes = await quoteRepository.GetAllAsync();
-
-            // Assert
-            Assert.All(quotes, q => Assert.True(q.Approved));
-        }
-
-        [Fact]
         public async Task Random_WithListOfQuotes_ReturnsRandomQuote()
         {
             // Arrange
@@ -99,6 +86,31 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
             Assert.Equal(category, quote.Category);
             Assert.Contains(quote, await quoteRepository.GetAllAsync());
 
+        }
+
+        [Fact]
+        public async Task Random_WithLimitedQuotesAndGivenCategory_AlwaysReturnsApprovedQuote()
+        {
+            // Arrange
+            var quoteRepository = new QuoteRepository(dbContext);
+            await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotesForApproveTest());
+            var category = "entrepreneurship";
+            var amountOfTries = 20;
+            List<Quote> quotes = [];
+
+            // Act
+            for(int i = 0;i<amountOfTries;i++)
+            {
+                var quote = await quoteRepository.GetRandomQuoteAsync(category);
+                quotes.Add(quote);
+            }
+
+            // Assert
+
+            Assert.All(quotes, q => Assert.True(q.Approved));
+            Assert.All(quotes, q => Assert.NotNull(q));
+            Assert.All(quotes, q => Assert.Equal(category, q.Category.ToString()));
+            Assert.All(quotes, q => Assert.Equal("Fortune favors the bold.", q.QuoteText));
         }
 
         [Fact]
