@@ -107,8 +107,8 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
 
             // Assert
 
-            Assert.All(quotes, q => Assert.True(q.Approved));
             Assert.All(quotes, q => Assert.NotNull(q));
+            Assert.All(quotes, q => Assert.True(q.Approved));
             Assert.All(quotes, q => Assert.Equal(category, q.Category.ToString()));
             Assert.All(quotes, q => Assert.Equal("Fortune favors the bold.", q.QuoteText));
         }
