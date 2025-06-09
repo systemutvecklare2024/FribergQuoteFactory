@@ -22,7 +22,6 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         public async Task AddQuote_WithValidQuote_AddsQuoteToRepository()
         {
             // Arrange
-
             var quoteRepository = new QuoteRepository(dbContext);
 
             var newQuote = new Quote
@@ -42,9 +41,7 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         public async Task AddRange_AddsQuotesToRepository()
         {
             // Arrange
-
             var quoteRepository = new QuoteRepository(dbContext);
-
 
             // Act
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetSingleQuote());
@@ -106,7 +103,6 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
             }
 
             // Assert
-
             Assert.All(quotes, q => Assert.NotNull(q));
             Assert.All(quotes, q => Assert.True(q.Approved));
             Assert.All(quotes, q => Assert.Equal(category, q.Category.ToString()));
