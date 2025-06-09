@@ -10,20 +10,24 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
     public class QuoteRepositoryTests : IDisposable
     {
         private readonly QuoteDbContext dbContext;
+        private readonly IQuoteRepository quoteRepository;
 
         public QuoteRepositoryTests()
         {
-            var contextOptions = new DbContextOptionsBuilder<QuoteDbContext>().UseInMemoryDatabase("test").Options;
+            var contextOptions = new DbContextOptionsBuilder<QuoteDbContext>()
+                .UseInMemoryDatabase("test")
+                .Options;
+
             dbContext = new QuoteDbContext(contextOptions);
             dbContext.Database.EnsureCreated();
+
+            quoteRepository = new QuoteRepository(dbContext);
         }
 
         [Fact]
-        public async Task AddQuote_WithValidQuote_AddsQuoteToRepository()
+        public async Task AddAsync_WithValidQuote_AddsQuoteToRepository()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
-
             var newQuote = new Quote
             {
                 QuoteText = "Carpe Diem",
@@ -38,10 +42,9 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task AddRange_AddsQuotesToRepository()
+        public async Task AddRangeAsync_AddsQuotesToRepository()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
 
             // Act
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetSingleQuote());
@@ -53,10 +56,9 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task Random_WithListOfQuotes_ReturnsRandomQuote()
+        public async Task GetRandomQuoteAsync_WithListOfQuotes_ReturnsRandomQuote()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
 
             // Act
@@ -68,10 +70,9 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task Random_WithListOfQuotesAndGivenCategory_ReturnsRandomQuoteOfCategory()
+        public async Task GetRandomQuoteAsync_WithListOfQuotesAndGivenCategory_ReturnsRandomQuoteOfCategory()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
             var category = "motivation";
 
@@ -86,17 +87,16 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task Random_WithLimitedQuotesAndGivenCategory_AlwaysReturnsApprovedQuote()
+        public async Task GetRandomQuoteAsync_WithLimitedQuotesAndGivenCategory_AlwaysReturnsApprovedQuote()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotesForApproveTest());
             var category = "entrepreneurship";
             var amountOfTries = 20;
             List<Quote> quotes = [];
 
             // Act
-            for(int i = 0;i<amountOfTries;i++)
+            for (int i = 0; i < amountOfTries; i++)
             {
                 var quote = await quoteRepository.GetRandomQuoteAsync(category);
                 quotes.Add(quote);
@@ -110,15 +110,67 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
-        public async Task Random_WithListOfQuotesAndWrongCategory_ThrowsException()
+        public async Task GetRandomQuoteAsync_WithListOfQuotesAndWrongCategory_ThrowsException()
         {
             // Arrange
-            var quoteRepository = new QuoteRepository(dbContext);
             await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
             var category = "test";
 
             // Act && Assert
             _ = Assert.ThrowsAsync<InvalidOperationException>(async () => await quoteRepository.GetRandomQuoteAsync(category));
+        }
+
+        [Fact]
+        public async Task GetUnapprovedAsync_WithListOfQuotes_ReturnsListOfUnapprovedQuotes()
+        {
+            // Arrange
+            await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
+
+            // Act
+            var quotes = await quoteRepository.GetUnapprovedQuotesAsync();
+
+            // Assert
+            Assert.All(quotes, q => Assert.False(q.Approved));
+        }
+
+        [Fact]
+        public async Task GetUnapprovedAsync_WithNoUnapprovedQuotes_ReturnsEmptyArray()
+        {
+            // Arrange
+            await quoteRepository.AddRangeAsync(QuotesFixtures.GetOnlyApprovedQuotes());
+
+            // Act
+            var quotes = await quoteRepository.GetUnapprovedQuotesAsync();
+
+            // Assert
+            Assert.Empty(quotes);
+        }
+
+        [Fact]
+        public async Task ApproveQuoteAsync_WithValidId_SetsQuoteAsApproved()
+        {
+            // Arrange
+            var quote = new Quote { Id = Guid.NewGuid(), QuoteText = "Carpe Diem.", Category = "motivation" };
+            await quoteRepository.AddAsync(quote);
+            var quoteFromRepo = (await quoteRepository.GetAllAsync()).FirstOrDefault();
+
+            // Act
+            await quoteRepository.ApproveQuoteAsync(quoteFromRepo.Id);
+            var updatedQuote = (await quoteRepository.GetAllAsync()).FirstOrDefault();
+
+            // Assert
+            Assert.True(updatedQuote?.Approved);
+        }
+
+        [Fact]
+        public async Task ApproveQuoteAsync_WithNoValidId_ThrowsException()
+        {
+            // Arrange
+            await quoteRepository.AddRangeAsync(QuotesFixtures.GetQuotes());
+
+            // Act
+            // Assert
+            _ = Assert.ThrowsAsync<InvalidOperationException>(async () => await quoteRepository.ApproveQuoteAsync(Guid.NewGuid()));
         }
 
         public void Dispose()

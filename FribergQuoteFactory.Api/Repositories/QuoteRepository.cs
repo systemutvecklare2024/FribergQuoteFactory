@@ -25,6 +25,19 @@ namespace FribergQuoteFactory.Api.Repositories
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task ApproveQuoteAsync(Guid id)
+        {
+            var quote = await dbContext.Quotes.FirstOrDefaultAsync(q => q.Id == id);
+            if (quote == null)
+            {
+                throw new InvalidOperationException("Quote not found.");
+            }
+
+            quote.Approved = true;
+            dbContext.Quotes.Update(quote);
+            await dbContext.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Quote>> GetAllAsync()
         {
             return await dbContext.Quotes.ToListAsync();
@@ -57,6 +70,11 @@ namespace FribergQuoteFactory.Api.Repositories
             }
 
             return sourceQuotes[random.Next(sourceQuotes.Count)];
+        }
+
+        public async Task<IEnumerable<Quote>> GetUnapprovedQuotesAsync()
+        {
+            return await dbContext.Quotes.Where(q => !q.Approved).ToListAsync();
         }
     }
 }
