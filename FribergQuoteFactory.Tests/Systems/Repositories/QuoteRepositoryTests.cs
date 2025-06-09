@@ -42,6 +42,24 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
         }
 
         [Fact]
+        public async Task AddAsync_WithValidQuote_AddedQuoteIsReturned()
+        {
+            // Arrange
+            var newQuote = new Quote
+            {
+                QuoteText = "Carpe Diem",
+                Category = "motivation",
+            };
+
+            // Act
+            var result = await quoteRepository.AddAsync(newQuote);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Contains(newQuote, await quoteRepository.GetAllAsync());
+        }
+
+        [Fact]
         public async Task AddRangeAsync_AddsQuotesToRepository()
         {
             // Arrange

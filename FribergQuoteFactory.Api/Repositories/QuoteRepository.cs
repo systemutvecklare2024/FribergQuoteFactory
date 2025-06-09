@@ -13,10 +13,12 @@ namespace FribergQuoteFactory.Api.Repositories
         {
             this.dbContext = dbContext;
         }
-        public async Task AddAsync(Quote newQuote)
+        public async Task<Quote> AddAsync(Quote newQuote)
         {
             await dbContext.Quotes.AddAsync(newQuote);
             await dbContext.SaveChangesAsync();
+
+            return newQuote;
         }
 
         public async Task AddRangeAsync(IEnumerable<Quote> quotes)
