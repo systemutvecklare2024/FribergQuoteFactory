@@ -35,5 +35,21 @@ namespace FribergQuoteFactory.Api.Controllers
 
             return Created($"quotes/{res.Id}", res);
         }
+
+        [HttpGet("random")]
+        public async Task<IActionResult> GetRandom([FromQuery] string? category)
+        {
+            var quote = await repository.GetRandomQuoteAsync(category);
+
+            return Ok(quote);
+        }
+
+        [HttpGet("unapproved")]
+        public async Task<IActionResult> GetUnapproved()
+        {
+            var quotes = await repository.GetUnapprovedQuotesAsync();
+
+            return Ok(quotes);
+        }
     }
 }
