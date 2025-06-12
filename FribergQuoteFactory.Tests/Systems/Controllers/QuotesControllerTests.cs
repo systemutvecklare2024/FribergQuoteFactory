@@ -28,9 +28,11 @@ namespace FribergQuoteFactory.Tests.Systems.Controllers
                     if (descriptor != null)
                         services.Remove(descriptor);
 
+                    var dbName = Guid.NewGuid().ToString();
+
                     services.AddDbContext<QuoteDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("test");
+                        options.UseInMemoryDatabase(dbName);
                     });
                 });
             });
