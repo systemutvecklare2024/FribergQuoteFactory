@@ -41,6 +41,11 @@ namespace FribergQuoteFactory.Api.Controllers
         {
             var quote = await repository.GetRandomQuoteAsync(category);
 
+            if(quote == null)
+            {
+                return NotFound("No found quote.");
+            }
+
             return Ok(quote);
         }
 
@@ -50,6 +55,26 @@ namespace FribergQuoteFactory.Api.Controllers
             var quotes = await repository.GetUnapprovedQuotesAsync();
 
             return Ok(quotes);
+        }
+
+        [HttpPut("{quoteId}/Approve")]
+        public async Task<IActionResult> Approve(Guid quoteId)
+        {
+            if(quoteId == Guid.Empty)
+            {
+                return BadRequest("Invalid quote Id");
+            }
+
+            try
+            {
+                await repository.ApproveQuoteAsync(quoteId);
+                return Ok();
+
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
