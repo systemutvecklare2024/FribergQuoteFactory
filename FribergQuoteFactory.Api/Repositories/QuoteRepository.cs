@@ -32,7 +32,7 @@ namespace FribergQuoteFactory.Api.Repositories
             var quote = await dbContext.Quotes.FirstOrDefaultAsync(q => q.Id == id);
             if (quote == null)
             {
-                throw new InvalidOperationException("Quote not found.");
+                throw new KeyNotFoundException("Quote not found.");
             }
 
             quote.Approved = true;
@@ -73,7 +73,7 @@ namespace FribergQuoteFactory.Api.Repositories
 
             if(!sourceQuotes.Any())
             {
-                throw new InvalidOperationException("No quotes found for the given category");
+                return null;
             }
 
             return sourceQuotes[random.Next(sourceQuotes.Count)];

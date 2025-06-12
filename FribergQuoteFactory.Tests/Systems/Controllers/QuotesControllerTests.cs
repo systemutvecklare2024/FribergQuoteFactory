@@ -59,9 +59,23 @@ namespace FribergQuoteFactory.Tests.Systems.Controllers
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Equal(newQuote.QuoteText, result?.QuoteText);
             Assert.Equal(newQuote.Category, result?.Category);
+        }
 
-            // GET quotes/{category}/randomquote
-            // GET quotes/{guid} <- get by id
+        [Fact]
+        public async Task PostQuote_WithMissingFields_Returns400()
+        {
+            // Arrange
+            var newQuote = new CreateQuoteDto
+            {
+                QuoteText = "Carpe diem"
+            };
+
+            // Act
+            var response = await httpClient.PostAsJsonAsync("quotes", newQuote);
+            var result = await response.Content.ReadFromJsonAsync<Quote>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
@@ -109,6 +123,35 @@ namespace FribergQuoteFactory.Tests.Systems.Controllers
         }
 
         [Fact]
+        public async Task GetRandomQuote_WithNoQuotes_ReturnsNotFound()
+        {
+            var response = await httpClient.GetAsync($"quotes/random");
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetRandomQuote_WithNonExistentCategory_ReturnsNotFound()
+        {
+            // Arrange
+            //Seed
+            using (var scope = applicationFactory.Services.CreateScope())
+            {
+                var repo = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
+                await repo.AddRangeAsync(QuotesFixtures.GetQuotes());
+            }
+            var category = "non-existent";
+
+            // Act
+            var response = await httpClient.GetAsync($"quotes/random?category={category}");
+            
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+
+        [Fact]
         public async Task GetUnapproved_WithQuotes_ReturnsAllUnapprovedQuotes()
         {
             // Arrange
@@ -139,33 +182,67 @@ namespace FribergQuoteFactory.Tests.Systems.Controllers
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(result);
             Assert.Empty(result);
         }
 
 
         [Fact]
-        public async Task AapproveQuote_WithGuid_ReturnsOk()
+        public async Task ApproveQuote_WithGuid_ReturnsOk()
         {
+            Guid quoteId;
+
+            // Test Approving
             using (var scope = applicationFactory.Services.CreateScope())
             {
                 // Arrange
-                
+
                 var repo = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
                 await repo.AddRangeAsync(QuotesFixtures.GetQuotes());
-                
-                var quoteToApprove = (await repo.GetUnapprovedQuotesAsync()).FirstOrDefault() ?? throw new InvalidOperationException("No unapproved quotes found.")
 
+                var quoteToApprove = (await repo.GetUnapprovedQuotesAsync()).FirstOrDefault() ?? throw new InvalidOperationException("No unapproved quotes found.");
+                quoteId = quoteToApprove.Id;
 
-                //// Act
-                //var response = await httpClient.PutAsync($"quotes/{quoteToApprove.Id}/Approve");
+                // Act
+                var response = await httpClient.PutAsync($"quotes/{quoteId}/Approve", null);
 
                 //// Assert
-                
-                //var refreshedQuote await repo.GetAllAsync();
+                response.EnsureSuccessStatusCode();
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                //Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                //Assert.
-                //Assert.Empty(result);
+            }
+
+            // Validate it got approved
+            using (var scope2 = applicationFactory.Services.CreateScope())
+            {
+                // Arrange
+                var repo = scope2.ServiceProvider.GetRequiredService<IQuoteRepository>();
+
+                // Act
+                var quote = await repo.GetAsync(quoteId);
+
+                // Assert
+                Assert.NotNull(quote);
+                Assert.True(quote.Approved);
+            }
+        }
+
+        [Theory]
+        [InlineData("74078bb5-666d-4948-a7af-039103cd41f6", HttpStatusCode.NotFound)]
+        [InlineData("00000000-0000-0000-0000-000000000000", HttpStatusCode.BadRequest)]
+        public async Task ApproveQuote_WithInvalidGuid_Returns(Guid id, HttpStatusCode expectedCode)
+        {
+            // Test Approving
+            using (var scope = applicationFactory.Services.CreateScope())
+            {
+                // Arrange
+                var repo = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
+
+                // Act
+                var response = await httpClient.PutAsync($"quotes/{id}/Approve", null);
+
+                //// Assert
+                Assert.Equal(expectedCode, response.StatusCode);
             }
         }
     }
