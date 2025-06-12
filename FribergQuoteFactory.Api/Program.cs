@@ -19,6 +19,17 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Seed data
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<QuoteDbContext>();
+    if(!db.Quotes.Any())
+    {
+        db.Quotes.AddRange(SeedData.SeedQuotes);
+        db.SaveChanges();
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
