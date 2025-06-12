@@ -191,6 +191,24 @@ namespace FribergQuoteFactory.Tests.Systems.Repositories
             _ = Assert.ThrowsAsync<InvalidOperationException>(async () => await quoteRepository.ApproveQuoteAsync(Guid.NewGuid()));
         }
 
+        [Fact]
+        public async Task GetAsync_WithValidId_ReturnsQuote()
+        {
+            // Arrange
+            var quote = new Quote
+            {
+                Id = Guid.NewGuid(),
+                QuoteText = "Carpe diem",
+                Category = "motivation"
+            };
+
+            // Act
+            await quoteRepository.AddAsync(quote);
+
+            // Assert
+            Assert.Single(await quoteRepository.GetAllAsync());
+        }
+
         public void Dispose()
         {
             dbContext.Database.EnsureDeleted();

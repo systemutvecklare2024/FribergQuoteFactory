@@ -8,6 +8,7 @@ namespace FribergQuoteFactory.Api.Contracts
         Task AddRangeAsync(IEnumerable<Quote> quotes);
         Task ApproveQuoteAsync(Guid id);
         Task<IEnumerable<Quote>> GetAllAsync();
+        Task<Quote?> GetAsync(Guid guid);
         Task<Quote> GetRandomQuoteAsync(string category = "");
         Task<IEnumerable<Quote>> GetUnapprovedQuotesAsync();
     }

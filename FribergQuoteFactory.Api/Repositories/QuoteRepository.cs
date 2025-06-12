@@ -45,6 +45,11 @@ namespace FribergQuoteFactory.Api.Repositories
             return await dbContext.Quotes.ToListAsync();
         }
 
+        public async Task<Quote?> GetAsync(Guid guid)
+        {
+            return await dbContext.Quotes.FirstOrDefaultAsync(q => q.Id == guid);
+        }
+
         public async Task<Quote> GetRandomQuoteAsync(string category = "")
         {
             var allQuotes = await dbContext.Quotes
